@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NotesApp.Controllers;
@@ -10,7 +11,7 @@ namespace NotesApp.Tests.Controllers
     public class NotesControllerTests
     {
         [Fact]
-        public void Get_ShouldReturnNoteList()
+        public async Task Get_ShouldReturnNoteList()
         {
             var expected = new List<Note>
             {
@@ -19,7 +20,7 @@ namespace NotesApp.Tests.Controllers
 
             var controller = new NotesController();
 
-            var response = controller.Get();
+            var response = await controller.Get();
             response.Should().NotBeNull();
             response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
 
