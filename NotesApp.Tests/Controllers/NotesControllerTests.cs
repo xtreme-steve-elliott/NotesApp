@@ -2,25 +2,46 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using NotesApp.Controllers;
 using NotesApp.Models;
+using NotesApp.Services;
 using Xunit;
 
 namespace NotesApp.Tests.Controllers
 {
     public class NotesControllerTests
     {
-        [Fact]
-        public async Task GetAsync_ShouldReturnNoteList()
+        private readonly Mock<INoteService> _noteServiceMock;
+        private readonly NotesController _controller;
+        
+        public NotesControllerTests()
         {
-            var expected = new List<Note>
+            _noteServiceMock = new Mock<INoteService>();
+            _controller = new NotesController(_noteServiceMock.Object);
+        }
+
+        [Fact]
+        public async Task GetAsync_ShouldCall_NoteService_GetNotesAsync()
+        {
+            await _controller.GetAsync();
+            _noteServiceMock.Verify(s => s.GetNotesAsync(), Times.Once);
+        }
+        
+        [Fact]
+        public async Task GetAsync_ShouldReturn_NoteService_GetNotesAsync()
+        {
+            var initial = new List<Note>
             {
                 new Note { Id = 1, Body = "Note 1" }
             };
+            var expected = initial;
 
-            var controller = new NotesController();
+            _noteServiceMock
+                .Setup(s => s.GetNotesAsync())
+                .ReturnsAsync(initial);
 
-            var response = await controller.GetAsync();
+            var response = await _controller.GetAsync();
             response.Should().NotBeNull();
             response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
 
