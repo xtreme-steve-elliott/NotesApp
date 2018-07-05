@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NotesApp.Models;
 
@@ -9,9 +10,9 @@ namespace NotesApp.Controllers
     public class NotesController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<IEnumerable<Note>> Get()
+        public async Task<ActionResult<IEnumerable<Note>>> GetAsync()
         {
-            return Ok(new[] { new Note { Id = 1, Body = "Note 1" } });
+            return await Task.FromResult(Ok(new[] { new Note { Id = 1, Body = "Note 1" } }));
         }
     }
 }
