@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NotesApp.Models;
+using NotesApp.Services;
 
 namespace NotesApp.Controllers
 {
@@ -9,10 +10,17 @@ namespace NotesApp.Controllers
     [ApiController]
     public class NotesController : ControllerBase
     {
+        private readonly INoteService _noteService;
+
+        public NotesController(INoteService noteService)
+        {
+            _noteService = noteService;
+        }
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Note>>> Get()
         {
-            return await Task.FromResult(Ok(new[] {new Note {Id = 1, Body = "Note 1"}}));
+            return Ok(await _noteService.GetNotes());
         }
     }
 }
