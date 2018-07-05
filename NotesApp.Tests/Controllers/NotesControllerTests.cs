@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NotesApp.Controllers;
 using NotesApp.Models;
@@ -20,20 +20,11 @@ namespace NotesApp.Tests.Controllers
             var controller = new NotesController();
 
             var response = controller.Get();
-            Assert.NotNull(response);
-            Assert.NotNull(response.Result);
-            Assert.IsType<OkObjectResult>(response.Result);
+            response.Should().NotBeNull();
+            response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
 
-            var value = ((OkObjectResult) response.Result).Value;
-            Assert.NotNull(value);
-            Assert.IsAssignableFrom<IEnumerable<Note>>(value);
-
-            var actual = ((IEnumerable<Note>) value).ToList();
-            Assert.NotNull(actual);
-            Assert.NotEmpty(actual);
-            Assert.Equal(actual.Count, expected.Count);
-            Assert.Equal(actual[0].Id, expected[0].Id);
-            Assert.Equal(actual[0].Body, expected[0].Body);
+            var actual = response.Result.As<OkObjectResult>().Value?.As<IEnumerable<Note>>();
+            actual.Should().NotBeNullOrEmpty().And.BeEquivalentTo(expected);
         }
     }
 }
