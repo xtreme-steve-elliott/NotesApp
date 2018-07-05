@@ -7,9 +7,17 @@ namespace NotesApp.Repositories
 {
     public class NoteRepository : INoteRepository
     {
+        private readonly NotesAppDbContext _context;
+        
+        public NoteRepository(NotesAppDbContext context)
+        {
+            _context = context;
+            _context.Database.EnsureCreated();
+        }
+        
         public Task<IEnumerable<Note>> GetNotes()
         {
-            return Task.FromResult(new[] {new Note {Id = 1, Body = "Note 1"}}.AsEnumerable());
+            return Task.FromResult(_context.Notes.AsEnumerable() ?? Enumerable.Empty<Note>());
         }
     }
 }

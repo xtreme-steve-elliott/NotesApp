@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NotesApp.Models;
 using NotesApp.Repositories;
 using NotesApp.Services;
 
@@ -20,6 +22,7 @@ namespace NotesApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<NotesAppDbContext>(ConfigureDb);
             services.AddTransient<INoteRepository, NoteRepository>();
             services.AddTransient<INoteService, NoteService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -39,6 +42,11 @@ namespace NotesApp
 
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        protected virtual void ConfigureDb(DbContextOptionsBuilder options)
+        {
+            options.UseInMemoryDatabase("notes_app");
         }
     }
 }
