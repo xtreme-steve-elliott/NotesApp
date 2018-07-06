@@ -18,5 +18,10 @@ namespace NotesApp.Services
         {
             return _noteRepository.GetNotes();
         }
+
+        public Task<Note> GetNote(long id)
+        {
+            return _noteRepository.GetNote(id);
+        }
     }
 }

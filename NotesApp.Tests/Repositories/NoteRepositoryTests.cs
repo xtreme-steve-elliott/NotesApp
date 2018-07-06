@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NotesApp.Models;
 using NotesApp.Repositories;
 using Xunit;
@@ -53,6 +54,28 @@ namespace NotesApp.Tests.Repositories
             
             var response = await _repository.GetNotes();
             response.Should().NotBeNullOrEmpty().And.BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task GetNote_ById_WhenInvalidId_ShouldReturnNull()
+        {
+            var actual = await _repository.GetNote(It.IsAny<long>());
+            actual.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetNote_ById_WhenValidId_ShouldReturnNote()
+        {
+            var initial = new Note {Id = 1, Body = "Note 1"};
+            var expected = new Note {Id = initial.Id, Body = initial.Body};
+
+            { // Setup for test until we get around to having an Add method in the service
+                _context.Notes.Add(initial);
+                _context.SaveChanges();
+            }
+
+            var actual = await _repository.GetNote(initial.Id);
+            actual.Should().NotBeNull().And.BeEquivalentTo(expected);
         }
     }
 }
