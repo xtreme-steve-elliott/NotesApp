@@ -19,5 +19,10 @@ namespace NotesApp.Repositories
         {
             return Task.FromResult(_context.Notes.AsEnumerable() ?? Enumerable.Empty<Note>());
         }
+
+        public Task<Note> GetNoteAsync(long id)
+        {
+            return Task.FromResult(_context.Notes.Find(id));
+        }
     }
 }

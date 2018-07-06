@@ -48,5 +48,43 @@ namespace NotesApp.Tests.Controllers
             var actual = response.Result.As<OkObjectResult>().Value?.As<IEnumerable<Note>>();
             actual.Should().NotBeNullOrEmpty().And.BeEquivalentTo(expected);
         }
+
+        [Fact]
+        public async Task GetAsync_ById_ShouldCall_NoteService_GetNoteAsync()
+        {
+            const long id = 0;
+            await _controller.GetAsync(id);
+            _noteServiceMock.Verify(s => s.GetNoteAsync(id), Times.Once);
+        }
+        
+        [Fact]
+        public async Task GetAsync_ById_WhenNoteService_GetNoteAsync_ReturnsNull_ShouldReturnNotFound()
+        {
+            _noteServiceMock
+                .Setup(s => s.GetNoteAsync(It.IsAny<long>()))
+                .ReturnsAsync(null as Note);
+            
+            var response = await _controller.GetAsync(It.IsAny<long>());
+            response.Should().NotBeNull();
+            response.Result.Should().NotBeNull().And.BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task GetAsync_ById_WhenNoteService_GetNoteAsync_ReturnsNote_ShouldReturnNote()
+        {
+            var initial = new Note { Id = 1, Body = "Note 1" };
+            var expected = new Note { Id = initial.Id, Body = initial.Body };
+
+            _noteServiceMock
+                .Setup(s => s.GetNoteAsync(It.IsAny<long>()))
+                .ReturnsAsync(initial);
+
+            var response = await _controller.GetAsync(It.IsAny<long>());
+            response.Should().NotBeNull();
+            response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
+
+            var value = response.Result.As<OkObjectResult>().Value;
+            value.Should().NotBeNull().And.BeOfType<Note>().Which.Should().BeEquivalentTo(expected);
+        }
     }
 }

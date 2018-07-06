@@ -7,5 +7,6 @@ namespace NotesApp.Services
     public interface INoteService
     {
         Task<IEnumerable<Note>> GetNotesAsync();
+        Task<Note> GetNoteAsync(long id);
     }
 }

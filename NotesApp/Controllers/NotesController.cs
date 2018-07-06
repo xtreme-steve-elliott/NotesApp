@@ -22,5 +22,18 @@ namespace NotesApp.Controllers
         {
             return Ok(await _noteService.GetNotesAsync());
         }
+
+        [HttpGet]
+        [Route("{id}", Name = "GetNoteById")]
+        public async Task<ActionResult<Note>> GetAsync(long id)
+        {
+            var foundNote = await _noteService.GetNoteAsync(id);
+            if (foundNote == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(foundNote);
+        }
     }
 }
