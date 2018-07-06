@@ -42,15 +42,13 @@ namespace NotesApp.Tests.Repositories
         [Fact]
         public async Task GetNotes_WhenNotes_ShouldReturnNoteList()
         {
+            var initial = new Note {Id = 1, Body = "Note 1"};
             var expected = new List<Note>
             {
-                new Note {Id = 1, Body = "Note 1"}
+                new Note {Id = initial.Id, Body = initial.Body}
             };
 
-            { // Setup for test until we get around to having an Add method in the service
-                _context.Notes.Add(expected[0]);
-                _context.SaveChanges();
-            }
+            await _repository.AddNote(initial);
             
             var response = await _repository.GetNotes();
             response.Should().NotBeNullOrEmpty().And.BeEquivalentTo(expected);
@@ -69,13 +67,41 @@ namespace NotesApp.Tests.Repositories
             var initial = new Note {Id = 1, Body = "Note 1"};
             var expected = new Note {Id = initial.Id, Body = initial.Body};
 
-            { // Setup for test until we get around to having an Add method in the service
-                _context.Notes.Add(initial);
-                _context.SaveChanges();
-            }
+            await _repository.AddNote(initial);
 
             var actual = await _repository.GetNote(initial.Id);
             actual.Should().NotBeNull().And.BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task AddNote_ShouldSaveNote()
+        {
+            var initial = new Note {Body = "Note 1"};
+            var expected = new List<Note>
+            {
+                new Note {Body = initial.Body}
+            };
+
+            var beforeGetNotesResponse = await _repository.GetNotes();
+            beforeGetNotesResponse.Should().NotBeNull().And.BeEmpty();
+            
+            await _repository.AddNote(initial);
+
+            var afterGetNotesResponse = await _repository.GetNotes();
+            // Note: Due to https://github.com/aspnet/EntityFrameworkCore/issues/6872 we can't assume a particular id
+            afterGetNotesResponse.Should().NotBeNull().And.BeEquivalentTo(expected, o => o.Excluding(n => n.Id));
+        }
+        
+        [Fact]
+        public async Task AddNote_ShouldReturnNoteThatWasSaved()
+        {
+            var initial = new Note {Body = "Note 1"};
+            var expected = new Note {Body = initial.Body};
+
+            var actual = await _repository.AddNote(initial);
+            actual.Should().NotBeNull().And.BeEquivalentTo(expected, o => o.Excluding(n => n.Id));
+            // Note: Due to https://github.com/aspnet/EntityFrameworkCore/issues/6872 we can't assume a particular id
+            actual.Id.Should().BePositive();
         }
     }
 }

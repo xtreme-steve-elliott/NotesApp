@@ -35,5 +35,17 @@ namespace NotesApp.Controllers
 
             return Ok(foundNote);
         }
+
+        [HttpPost]
+        public async Task<ActionResult> Post([FromBody] Note note)
+        {
+            if (note == null)
+            {
+                return BadRequest();
+            }
+
+            var processedNote = await _noteService.AddNote(note);
+            return CreatedAtRoute("GetNoteById", new {id = processedNote.Id}, processedNote);
+        }
     }
 }

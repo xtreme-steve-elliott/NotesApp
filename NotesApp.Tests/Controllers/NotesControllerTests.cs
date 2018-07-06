@@ -86,5 +86,50 @@ namespace NotesApp.Tests.Controllers
             var value = response.Result.As<OkObjectResult>().Value;
             value.Should().NotBeNull().And.BeOfType<Note>().Which.Should().BeEquivalentTo(expected);
         }
+
+        [Fact]
+        public async Task Post_WhenInvalidNote_ShouldNotCallAddNote()
+        {
+            await _controller.Post(null);
+            _mockNoteService.Verify(s => s.AddNote(It.IsAny<Note>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Post_WhenInvalidNote_ShouldReturnBadRequest()
+        {
+            var response = await _controller.Post(null);
+            response.Should().NotBeNull().And.BeOfType<BadRequestResult>();
+        }
+
+        [Fact]
+        public async Task Post_WhenValidNote_ShouldCallAddNote()
+        {
+            var note = new Note { Body = "Note 1" };
+            
+            _mockNoteService
+                .Setup(s => s.AddNote(It.IsAny<Note>()))
+                .ReturnsAsync(new Note());
+            
+            await _controller.Post(note);
+            _mockNoteService.Verify(s => s.AddNote(note), Times.Once);
+        }
+
+        [Fact]
+        public async Task Post_WhenValidNote_ShouldReturnCreatedAtRoute()
+        {
+            var initial = new Note {Id = 1, Body = "Note 1"};
+            var expected = new Note {Id = initial.Id, Body = initial.Body};
+            
+            _mockNoteService
+                .Setup(s => s.AddNote(It.IsAny<Note>()))
+                .ReturnsAsync(initial);
+
+            var response = await _controller.Post(initial);
+            response.Should().NotBeNull().And.BeOfType<CreatedAtRouteResult>();
+
+            var actual = response.As<CreatedAtRouteResult>();
+            actual.RouteValues.Should().Contain("id", expected.Id);
+            actual.Value.Should().NotBeNull().And.BeEquivalentTo(expected);
+        }
     }
 }

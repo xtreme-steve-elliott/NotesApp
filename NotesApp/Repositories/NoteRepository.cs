@@ -24,5 +24,12 @@ namespace NotesApp.Repositories
         {
             return Task.FromResult(_context.Notes.Find(id));
         }
+
+        public async Task<Note> AddNote(Note note)
+        {
+            var entry = _context.Add(note);
+            await _context.SaveChangesAsync();
+            return entry.Entity;
+        }
     }
 }
