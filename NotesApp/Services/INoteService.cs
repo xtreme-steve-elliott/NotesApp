@@ -9,5 +9,6 @@ namespace NotesApp.Services
         Task<IEnumerable<Note>> GetNotesAsync();
         Task<Note> GetNoteAsync(long id);
         Task<Note> AddNoteAsync(Note note);
+        Task<bool> DeleteNoteAsync(long id);
     }
 }

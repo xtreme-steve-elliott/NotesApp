@@ -87,5 +87,26 @@ namespace NotesApp.Tests.Services
             var actual = await _service.AddNoteAsync(It.IsAny<Note>());
             actual.Should().NotBeNull().And.BeEquivalentTo(expected);
         }
+
+        [Fact]
+        public async Task DeleteNoteAsync_ById_ShouldCall_NoteService_DeleteNoteAsync()
+        {
+            const long id = 0;
+            await _service.DeleteNoteAsync(id);
+            _noteRepositoryMock.Verify(r => r.DeleteNoteAsync(id), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task DeleteNoteAsync_ById_ShouldReturn_NoteService_DeleteNoteAsync(bool success)
+        {
+            _noteRepositoryMock
+                .Setup(r => r.DeleteNoteAsync(It.IsAny<long>()))
+                .ReturnsAsync(success);
+
+            var actual = await _service.DeleteNoteAsync(It.IsAny<long>());
+            actual.Should().Be(success);
+        }
     }
 }

@@ -47,5 +47,16 @@ namespace NotesApp.Controllers
             var processedNote = await _noteService.AddNoteAsync(note);
             return CreatedAtRoute("GetNoteById", new { id = processedNote.Id }, processedNote);
         }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<ActionResult> DeleteAsync(long id)
+        {
+            if (await _noteService.DeleteNoteAsync(id))
+            {
+                return Ok();
+            }
+            return NotFound();
+        }
     }
 }
