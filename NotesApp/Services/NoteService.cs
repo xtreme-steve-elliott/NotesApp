@@ -28,5 +28,10 @@ namespace NotesApp.Services
         {
             return _noteRepository.AddNote(note);
         }
+
+        public Task<bool> DeleteNote(long id)
+        {
+            return _noteRepository.DeleteNote(id);
+        }
     }
 }

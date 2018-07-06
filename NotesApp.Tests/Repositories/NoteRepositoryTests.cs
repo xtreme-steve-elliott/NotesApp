@@ -103,5 +103,23 @@ namespace NotesApp.Tests.Repositories
             // Note: Due to https://github.com/aspnet/EntityFrameworkCore/issues/6872 we can't assume a particular id
             actual.Id.Should().BePositive();
         }
+
+        [Fact]
+        public async Task DeleteNote_ById_WhenInvalidId_ShouldReturnFalse()
+        {
+            var actual = await _repository.DeleteNote(It.IsAny<long>());
+            actual.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task DeleteNote_ById_WhenValidId_ShouldReturnTrue()
+        {
+            var initial = new Note {Id = 1, Body = "Note 1"};
+
+            await _repository.AddNote(initial);
+
+            var actual = await _repository.DeleteNote(initial.Id);
+            actual.Should().BeTrue();
+        }
     }
 }

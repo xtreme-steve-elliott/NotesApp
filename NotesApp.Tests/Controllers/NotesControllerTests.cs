@@ -131,5 +131,27 @@ namespace NotesApp.Tests.Controllers
             actual.RouteValues.Should().Contain("id", expected.Id);
             actual.Value.Should().NotBeNull().And.BeEquivalentTo(expected);
         }
+
+        [Fact]
+        public async Task Delete_WhenUnsuccessful_ShouldReturnNotFound()
+        {
+            _mockNoteService
+                .Setup(s => s.DeleteNote(It.IsAny<long>()))
+                .ReturnsAsync(false);
+
+            var actual = await _controller.Delete(It.IsAny<long>());
+            actual.Should().NotBeNull().And.BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task Delete_WhenSuccessful_ShouldReturnOk()
+        {
+            _mockNoteService
+                .Setup(s => s.DeleteNote(It.IsAny<long>()))
+                .ReturnsAsync(true);
+
+            var actual = await _controller.Delete(It.IsAny<long>());
+            actual.Should().NotBeNull().And.BeOfType<OkResult>();
+        }
     }
 }

@@ -31,5 +31,18 @@ namespace NotesApp.Repositories
             await _context.SaveChangesAsync();
             return entry.Entity;
         }
+
+        public async Task<bool> DeleteNote(long id)
+        {
+            var foundNote = _context.Notes.Find(id);
+            if (foundNote == null)
+            {
+                return false;
+            }
+
+            _context.Notes.Remove(foundNote);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
