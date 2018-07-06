@@ -42,40 +42,66 @@ namespace NotesApp.Tests.Repositories
         [Fact]
         public async Task GetNotesAsync_WhenNotes_ShouldReturnNoteList()
         {
+            var initial = new Note { Id = 1, Body = "Note 1" };
             var expected = new List<Note>
             {
-                new Note { Id = 1, Body = "Note 1" }
+                new Note { Id = initial.Id, Body = initial.Body }
             };
 
-            { // Setup for test until we get around to having an Add method in the service
-                _context.Notes.Add(expected[0]);
-                _context.SaveChanges();
-            }
+            await _repository.AddNoteAsync(initial);
             
             var response = await _repository.GetNotesAsync();
             response.Should().NotBeNullOrEmpty().And.BeEquivalentTo(expected);
         }
 
         [Fact]
-        public async Task GetNote_ById_WhenInvalidId_ShouldReturnNull()
+        public async Task GetNoteAsync_ById_WhenInvalidId_ShouldReturnNull()
         {
             var actual = await _repository.GetNoteAsync(It.IsAny<long>());
             actual.Should().BeNull();
         }
 
         [Fact]
-        public async Task GetNote_ById_WhenValidId_ShouldReturnNote()
+        public async Task GetNoteAsync_ById_WhenValidId_ShouldReturnNote()
         {
             var initial = new Note { Id = 1, Body = "Note 1" };
             var expected = new Note { Id = initial.Id, Body = initial.Body };
 
-            { // Setup for test until we get around to having an Add method in the service
-                _context.Notes.Add(initial);
-                _context.SaveChanges();
-            }
+            await _repository.AddNoteAsync(initial);
 
             var actual = await _repository.GetNoteAsync(initial.Id);
             actual.Should().NotBeNull().And.BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task AddNoteAsync_ShouldSaveNote()
+        {
+            var initial = new Note { Body = "Note 1" };
+            var expected = new List<Note>
+            {
+                new Note { Body = initial.Body }
+            };
+
+            var beforeGetNotesResponse = await _repository.GetNotesAsync();
+            beforeGetNotesResponse.Should().NotBeNull().And.BeEmpty();
+            
+            await _repository.AddNoteAsync(initial);
+
+            var afterGetNotesResponse = await _repository.GetNotesAsync();
+            // Note: Due to https://github.com/aspnet/EntityFrameworkCore/issues/6872 we can't assume a particular id
+            afterGetNotesResponse.Should().NotBeNull().And.BeEquivalentTo(expected, o => o.Excluding(n => n.Id));
+        }
+        
+        [Fact]
+        public async Task AddNoteAsync_ShouldReturnNoteThatWasSaved()
+        {
+            var initial = new Note { Body = "Note 1" };
+            var expected = new Note { Body = initial.Body };
+
+            var actual = await _repository.AddNoteAsync(initial);
+            actual.Should().NotBeNull().And.BeEquivalentTo(expected, o => o.Excluding(n => n.Id));
+            // Note: Due to https://github.com/aspnet/EntityFrameworkCore/issues/6872 we can't assume a particular id
+            actual.Id.Should().BePositive();
         }
     }
 }

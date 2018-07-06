@@ -23,5 +23,10 @@ namespace NotesApp.Services
         {
             return _noteRepository.GetNoteAsync(id);
         }
+
+        public Task<Note> AddNoteAsync(Note note)
+        {
+            return _noteRepository.AddNoteAsync(note);
+        }
     }
 }

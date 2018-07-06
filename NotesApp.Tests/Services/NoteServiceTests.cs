@@ -65,5 +65,27 @@ namespace NotesApp.Tests.Services
             var actual = await _service.GetNoteAsync(It.IsAny<long>());
             actual.Should().NotBeNull().And.BeEquivalentTo(expected);
         }
+
+        [Fact]
+        public async Task AddNoteAsync_ShouldCall_NoteRepository_AddNoteAsync()
+        {
+            var initial = new Note();
+            await _service.AddNoteAsync(initial);
+            _noteRepositoryMock.Verify(r => r.AddNoteAsync(initial), Times.Once);
+        }
+        
+        [Fact]
+        public async Task AddNoteAsync_ShouldReturn_NoteRepository_AddNoteAsync()
+        {
+            var initial = new Note { Id = 1, Body = "Note 1" };
+            var expected = new Note { Id = initial.Id, Body = initial.Body };
+
+            _noteRepositoryMock
+                .Setup(r => r.AddNoteAsync(It.IsAny<Note>()))
+                .ReturnsAsync(initial);
+
+            var actual = await _service.AddNoteAsync(It.IsAny<Note>());
+            actual.Should().NotBeNull().And.BeEquivalentTo(expected);
+        }
     }
 }
