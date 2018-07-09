@@ -25,6 +25,7 @@ namespace NotesApp
             services.AddDbContext<NotesAppDbContext>(ConfigureDb);
             services.AddTransient<INoteRepository, NoteRepository>();
             services.AddTransient<INoteService, NoteService>();
+            services.AddRouting(opt => opt.LowercaseUrls = true);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
