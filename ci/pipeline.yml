@@ -1,0 +1,22 @@
+---
+resources:
+  - name: repo
+    type: git
+    source:
+      uri: {{repo-url}}
+      branch: master
+
+jobs:
+  - name: test
+    plan:
+      - get: repo
+        trigger: true
+      - aggregate:
+        - task: test
+          file: repo/ci/tasks/test.yml
+          params:
+            PROJECT_NAME: NotesApp.Tests
+        - task: integration-test
+          file: repo/ci/tasks/test.yml
+          params:
+            PROJECT_NAME: NotesApp.IntegrationTests

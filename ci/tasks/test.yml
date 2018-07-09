@@ -1,0 +1,13 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: microsoft/dotnet
+    tag: 2.2-sdk
+
+inputs:
+  - name: repo
+
+run:
+  path: ./repo/ci/tasks/test.sh
