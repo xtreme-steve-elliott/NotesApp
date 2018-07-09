@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NotesApp.Models;
 using NotesApp.Repositories;
 using NotesApp.Services;
+using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 
 namespace NotesApp
 {
@@ -47,7 +48,7 @@ namespace NotesApp
 
         protected virtual void ConfigureDb(DbContextOptionsBuilder options)
         {
-            options.UseInMemoryDatabase("notes_app");
+            options.UseMySql(Configuration);
         }
     }
 }
