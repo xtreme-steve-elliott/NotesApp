@@ -1,0 +1,5 @@
+applications:
+  - name: notes
+    buildpack: https://github.com/cloudfoundry/dotnet-core-buildpack.git#v2.2.7
+    services:
+      - notes-db

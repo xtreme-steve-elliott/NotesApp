@@ -1,1 +1,6 @@
 repo-url: https://github.com/xtreme-steve-elliott/NotesApp.git
+cf-api: api.dev.cfdev.sh
+cf-username: admin
+cf-password: admin
+cf-organization: cfdev-org
+cf-space: cfdev-space

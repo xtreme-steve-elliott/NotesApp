@@ -6,6 +6,16 @@ resources:
       uri: {{repo-url}}
       branch: master
 
+  - name: cf-deploy
+    type: cf
+    source:
+      api: {{cf-api}}
+      username: {{cf-username}}
+      password: {{cf-password}}
+      organization: {{cf-organization}}
+      space: {{cf-space}}
+      skip_cert_check: true
+
 jobs:
   - name: test
     plan:
@@ -30,3 +40,7 @@ jobs:
         file: repo/ci/tasks/build.yml
         params:
           PROJECT_NAME: NotesApp
+      - put: cf-deploy
+        params:
+          manifest: repo/ci/manifest.yml
+          path: published
