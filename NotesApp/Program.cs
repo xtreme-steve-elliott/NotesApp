@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Steeltoe.Extensions.Configuration.CloudFoundry;
 
 namespace NotesApp
 {
@@ -14,6 +15,7 @@ namespace NotesApp
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseCloudFoundryHosting()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
                 .ConfigureAppConfiguration((builderContext, config) =>
@@ -21,7 +23,9 @@ namespace NotesApp
                     config
                         .SetBasePath(builderContext.HostingEnvironment.ContentRootPath)
                         .AddJsonFile("appsettings.json", false, true)
-                        .AddJsonFile($"appsettings.{builderContext.HostingEnvironment.EnvironmentName}.json", true);
+                        .AddJsonFile($"appsettings.{builderContext.HostingEnvironment.EnvironmentName}.json", true)
+                        .AddCloudFoundry()
+                        .AddEnvironmentVariables();
                 });
     }
 }
