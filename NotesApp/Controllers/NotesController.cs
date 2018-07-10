@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NotesApp.Models;
@@ -18,6 +19,8 @@ namespace NotesApp.Controllers
         }
         
         [HttpGet]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<Note>), (int) HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<Note>>> GetAsync()
         {
             return Ok(await _noteService.GetNotesAsync());
@@ -25,7 +28,10 @@ namespace NotesApp.Controllers
 
         [HttpGet]
         [Route("{id}", Name = "GetNoteById")]
-        public async Task<ActionResult<Note>> GetAsync(long id)
+        [Produces("application/json")]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(Note), (int) HttpStatusCode.OK)]
+        public async Task<ActionResult<Note>> GetAsync([FromRoute] long id)
         {
             var foundNote = await _noteService.GetNoteAsync(id);
             if (foundNote == null)
@@ -37,6 +43,9 @@ namespace NotesApp.Controllers
         }
 
         [HttpPost]
+        [Produces("application/json")]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(Note), (int) HttpStatusCode.Created)]
         public async Task<ActionResult> PostAsync([FromBody] Note note)
         {
             if (note == null)
@@ -50,7 +59,10 @@ namespace NotesApp.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<ActionResult> DeleteAsync(long id)
+        [Produces("application/json")]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        public async Task<ActionResult> DeleteAsync([FromRoute] long id)
         {
             if (await _noteService.DeleteNoteAsync(id))
             {
