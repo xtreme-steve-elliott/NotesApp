@@ -20,3 +20,13 @@ jobs:
           file: repo/ci/tasks/test.yml
           params:
             PROJECT_NAME: NotesApp.IntegrationTests
+
+  - name: build-deploy
+    plan:
+      - get: repo
+        trigger: true
+        passed: [test]
+      - task: build
+        file: repo/ci/tasks/build.yml
+        params:
+          PROJECT_NAME: NotesApp
