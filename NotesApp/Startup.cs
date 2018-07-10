@@ -8,11 +8,13 @@ using NotesApp.Models;
 using NotesApp.Repositories;
 using NotesApp.Services;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace NotesApp
 {
     public class Startup
     {
+        private const string SwaggerVersion = "v1";
         public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
@@ -28,6 +30,10 @@ namespace NotesApp
             services.AddTransient<INoteService, NoteService>();
             services.AddRouting(opt => opt.LowercaseUrls = true);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc(SwaggerVersion, new Info {Title = "Notes App API", Version = SwaggerVersion});
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +50,11 @@ namespace NotesApp
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+               c.SwaggerEndpoint($"/swagger/{SwaggerVersion}/swagger.json", $"Notes App API {SwaggerVersion}"); 
+            });
         }
 
         protected virtual void ConfigureDb(DbContextOptionsBuilder options)

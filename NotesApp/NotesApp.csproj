@@ -7,5 +7,6 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.0" />
     <PackageReference Include="Steeltoe.CloudFoundry.Connector.EFCore" Version="2.0.0" />
     <PackageReference Include="Steeltoe.CloudFoundry.ConnectorCore" Version="2.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
   </ItemGroup>
 </Project>
