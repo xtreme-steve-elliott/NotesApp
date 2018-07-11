@@ -45,6 +45,7 @@ jobs:
         params:
           manifest: repo/ci/manifest.yml
           path: published
+          current_app_name: notes
 
   - name: smoke-test
     serial_groups: [deploy]
