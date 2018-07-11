@@ -32,6 +32,7 @@ jobs:
             PROJECT_NAME: NotesApp.IntegrationTests
 
   - name: build-deploy
+    serial_groups: [deploy]
     plan:
       - get: repo
         trigger: true
@@ -44,3 +45,17 @@ jobs:
         params:
           manifest: repo/ci/manifest.yml
           path: published
+
+  - name: smoke-test
+    serial_groups: [deploy]
+    plan:
+      - get: repo
+        passed: [build-deploy]
+      - get: cf-deploy
+        trigger: true
+        passed: [build-deploy]
+      - task: newman-test
+        file: repo/ci/tasks/newman-test.yml
+        params:
+          COLLECTION_URL: repo/ci/newman/NotesApp.postman_collection.json
+          ENVIRONMENT_URL: repo/ci/newman/NotesApp.postman_environment.json

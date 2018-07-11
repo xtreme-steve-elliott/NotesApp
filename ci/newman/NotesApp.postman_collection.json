@@ -1,0 +1,478 @@
+{
+	"info": {
+		"_postman_id": "9249cf17-e9e4-44d2-aaff-4de37ac307ce",
+		"name": "NotesApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "api",
+			"description": "Folder for api",
+			"item": [
+				{
+					"name": "Notes (No notes)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "217be9fd-94f7-44a1-9fa6-97836c55000e",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Returns status code OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Returns empty array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.eql([]);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BASE_URL}}/notes",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"notes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Notes (Notes found)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b60f57ee-a58e-4fc9-9140-38a28ed224d5",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Returns status code OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Returns array with note in it\", function () {",
+									"    var notes = pm.response.json();",
+									"    pm.expect(notes).to.have.length(1);",
+									"    var note = notes[0];",
+									"    pm.expect(note).to.have.property(\"id\");",
+									"    pm.expect(note.id).to.eql(pm.environment.get(\"CREATED_NOTE_ID\"));",
+									"    pm.expect(note).to.have.property(\"body\");",
+									"    pm.expect(note.body).to.eql(\"Test Note\");",
+									"});",
+									"",
+									"pm.sendRequest({",
+									"   url: pm.environment.get(\"BASE_URL\") + \"/notes/\" + pm.environment.get(\"CREATED_NOTE_ID\"),",
+									"   method: \"DELETE\",",
+									"   header: {",
+									"       \"Content-Type\": \"application/json\"",
+									"   }",
+									"}, function(err, res) {",
+									"    pm.environment.unset(\"CREATED_NOTE_ID\");",
+									"});"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "37e880aa-f308-45cc-b555-76567db3c139",
+								"type": "text/javascript",
+								"exec": [
+									"pm.sendRequest({",
+									"   url: pm.environment.get(\"BASE_URL\") + \"/notes\",",
+									"   method: \"POST\",",
+									"   header: {",
+									"       \"Content-Type\": \"application/json\"",
+									"   },",
+									"   body: {",
+									"       mode: 'raw',",
+									"       raw: JSON.stringify({\"body\": \"Test Note\"})",
+									"   }",
+									"}, function(err, res) {",
+									"    pm.environment.set(\"CREATED_NOTE_ID\", res.json().id)",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BASE_URL}}/notes",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"notes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Notes (Invalid note)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "adb4eb8d-df0c-42fd-9a0f-7a2c0e30176f",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Returns status code Bad Request\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/notes",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"notes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Notes (Valid note)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1017167e-6083-4cb7-a487-f4b2c1e41f4e",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Returns status code Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.environment.set(\"CREATED_NOTE_ID\", pm.response.json().id);",
+									"",
+									"pm.test(\"Returns with correct headers\", function() {",
+									"    pm.response.headers.has(\"Location\", pm.environment.get(\"BASE_URL\") + \"/notes/\" + pm.environment.get(\"CREATED_NOTE_ID\"));",
+									"});",
+									"",
+									"pm.sendRequest({",
+									"   url: pm.environment.get(\"BASE_URL\") + \"/notes/\" + pm.environment.get(\"CREATED_NOTE_ID\"),",
+									"   method: \"DELETE\",",
+									"   header: {",
+									"       \"Content-Type\": \"application/json\"",
+									"   }",
+									"}, function(err, res) {",
+									"    pm.environment.unset(\"CREATED_NOTE_ID\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"body\": \"Test Note\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/notes",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"notes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Note (Id not found)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "76b57536-d62f-4d8a-9a86-f4e7d073b6e4",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Returns status code Not Found\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BASE_URL}}/Notes/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"Notes",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Note (Id found)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f3567abf-0862-4624-a262-92c55689eccf",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Returns status code Ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Returns proper note\", function () {",
+									"    var note = pm.response.json();",
+									"    pm.expect(note).to.have.property(\"id\");",
+									"    pm.expect(note.id).to.eql(pm.environment.get(\"CREATED_NOTE_ID\"));",
+									"    pm.expect(note).to.have.property(\"body\");",
+									"    pm.expect(note.body).to.eql(\"Test Note\");",
+									"});",
+									"",
+									"pm.sendRequest({",
+									"   url: pm.environment.get(\"BASE_URL\") + \"/notes/\" + pm.environment.get(\"CREATED_NOTE_ID\"),",
+									"   method: \"DELETE\",",
+									"   header: {",
+									"       \"Content-Type\": \"application/json\"",
+									"   }",
+									"}, function(err, res) {",
+									"    pm.environment.unset(\"CREATED_NOTE_ID\");",
+									"});"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aabfa750-7c10-45dd-add9-10a36d699a41",
+								"type": "text/javascript",
+								"exec": [
+									"pm.sendRequest({",
+									"   url: pm.environment.get(\"BASE_URL\") + \"/notes\",",
+									"   method: \"POST\",",
+									"   header: {",
+									"       \"Content-Type\": \"application/json\"",
+									"   },",
+									"   body: {",
+									"       mode: 'raw',",
+									"       raw: JSON.stringify({\"body\": \"Test Note\"})",
+									"   }",
+									"}, function(err, res) {",
+									"    pm.environment.set(\"CREATED_NOTE_ID\", res.json().id)",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BASE_URL}}/Notes/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"Notes",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{CREATED_NOTE_ID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Note (Id not found)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8006db2e-93cd-4912-bde6-e651f0ce49ee",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Returns status code Not Found\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{BASE_URL}}/notes/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"notes",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Note (Id found)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a620603e-62a7-4f91-9e78-287e56ad23d3",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Returns status code Ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.environment.unset(\"CREATED_NOTE_ID\");"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7edcbc97-6a14-40b6-9d12-313647153225",
+								"type": "text/javascript",
+								"exec": [
+									"pm.sendRequest({",
+									"   url: pm.environment.get(\"BASE_URL\") + \"/notes\",",
+									"   method: \"POST\",",
+									"   header: {",
+									"       \"Content-Type\": \"application/json\"",
+									"   },",
+									"   body: {",
+									"       mode: 'raw',",
+									"       raw: JSON.stringify({\"body\": \"Test Note\"})",
+									"   }",
+									"}, function(err, res) {",
+									"    pm.environment.set(\"CREATED_NOTE_ID\", res.json().id)",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/notes/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"notes",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{CREATED_NOTE_ID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

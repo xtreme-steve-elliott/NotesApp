@@ -1,0 +1,14 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: postman/newman_alpine33
+
+inputs:
+  - name: repo
+
+run:
+  path: sh
+  args:
+    - repo/ci/tasks/newman-test.sh
